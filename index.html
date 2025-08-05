@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXPRESSA - Soluciones Integrales de Diseño e Impresión</title>
+    <style>
+        :root {
+            --primary: #0066ff;
+            --secondary: #ff3366;
+            --accent: #00ccaa;
+            --dark: #121212;
+            --light: #f8f9fa;
+            --transition: all 0.3s ease;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        body {
+            overflow-x: hidden;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(0, 102, 255, 0.3);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s;
+        }
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.5;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            position: relative;
+        }
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: var(--transition);
+        }
+        .logo:hover::after {
+            width: 100%;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 5px 0;
+            transition: var(--transition);
+        }
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+            z-index: -1;
+        }
+        .hero-content {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 0 20px;
+            z-index: 1;
+        }
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeUp 1s forwards 0.5s;
+        }
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeUp 1s forwards 0.7s;
+        }
+        @keyframes fadeUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: var(--secondary);
+            transition: var(--transition);
+            z-index: -1;
+        }
+        .btn:hover::before {
+            width: 100%;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 50px;
+            border: 2px solid white;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .scroll-indicator::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            margin-top: 10px;
+            animation: scrollDown 1.5s infinite;
+        }
+        @keyframes scrollDown {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+        }
+        .services {
+            padding: 100px 0;
+            background: var(--light);
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            font-size: 2.5rem;
+            color: var(--dark);
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            position: relative;
+            height: 300px;
+            cursor: pointer;
+        }
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        .service-img {
+            height: 60%;
+            width: 100%;
+            object-fit: cover;
+        }
+        .service-content {
+            padding: 20px;
+        }
+        .service-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        .service-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .calculator {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            z-index: 100;
+        }
+        .calculator:hover {
+            transform: scale(1.1);
+            background: var(--secondary);
+        }
+        .calculator-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .calculator-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .calculator-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            padding: 30px;
+            position: relative;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .calculator-modal.active .calculator-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        .calculator-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .calculator-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .calculator-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        .calculator-panel {
+            display: none;
+        }
+        .calculator-panel.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .range-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .portfolio {
+            padding: 100px 0;
+            background: #f0f2f5;
+        }
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .portfolio-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            height: 250px;
+            cursor: pointer;
+        }
+        .portfolio-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        .portfolio-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .portfolio-item:hover .portfolio-overlay {
+            opacity: 1;
+        }
+        .portfolio-item:hover .portfolio-img {
+            transform: scale(1.1);
+        }
+        .portfolio-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        .portfolio-category {
+            color: var(--accent);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        .portfolio-item:hover .portfolio-title,
+        .portfolio-item:hover .portfolio-category {
+            transform: translateY(0);
+        }
+        .tech {
+            padding: 100px 0;
+            background: var(--light);
+        }
+        .tech-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tech-content {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 50px;
+        }
+        .tech-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        .tech-desc {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .tech-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #666;
+        }
+        .tech-image {
+            flex: 1;
+            min-width: 300px;
+            height: 400px;
+            background: url('https://source.unsplash.com/random/600x800/?printing') center/cover;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .testimonials {
+            padding: 100px 0;
+            background: #f0f2f5;
+        }
+        .testimonial-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .testimonial-slider {
+            position: relative;
+            overflow: hidden;
+            height: 300px;
+        }
+        .testimonial-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 50px;
+        }
+        .testimonial-slide.active {
+            opacity: 1;
+        }
+        .testimonial-quote {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .testimonial-company {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        .testimonial-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .testimonial-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .testimonial-dot.active {
+            background: var(--primary);
+        }
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 50px 0 20px;
+        }
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .footer-desc {
+            color: #aaa;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .footer-social {
+            display: flex;
+            gap: 15px;
+        }
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        .social-icon:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+        }
+        .footer-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--primary);
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+        .footer-contact {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+        .footer-contact i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid #333;
+            color: #aaa;
+        }
+        .footer-bottom a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+            nav ul.active {
+                display: flex;
+            }
+            nav ul li {
+                margin: 10px 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .tech-content, .tech-image {
+                min-width: 100%;
+                padding-right: 0;
+                margin-bottom: 30px;
+            }
+            .tech-image {
+                height: 300px;
+            }
+        }
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .btn {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>
+    <div class="cursor-trail"></div>
+    
+    <header>
+        <a href="#" class="logo">EXPRESSA</a>
+        <nav>
+            <div class="menu-toggle">☰</div>
+            <ul>
+                <li><a href="#home">Inicio</a></li>
+                <li><a href="#services">Servicios</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#tech">Tecnología</a></li>
+                <li><a href="#contact">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <video class="hero-video" autoplay muted loop>
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-ink-in-water-abstract-background-169.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">DONDE LAS IDEAS TOMAN FORMA</h1>
+            <p class="hero-subtitle">Soluciones integrales de diseño e impresión con tecnología de vanguardia</p>
+            <a href="#services" class="btn">Descubrir Servicios</a>
+        </div>
+        <div class="scroll-indicator"></div>
+    </section>
+
+    <section id="services" class="services">
+        <h2 class="section-title">Nuestros Servicios</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <img src="https://source.unsplash.com/random/600x400/?logo" alt="Logo Design" class="service-img">
+                <div class="service-content">
+                    <h3 class="service-title">Diseño de Logo</h3>
+                    <p class="service-desc">Creamos identidades visuales únicas que representan la esencia de tu marca.</p>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://source.unsplash.com/random/600x400/?textile" alt="Impresión Textil" class="service-img">
+                <div class="service-content">
+                    <h3 class="service-title">Impresión Textil</h3>
+                    <p class="service-desc">Estampados de alta calidad en todo tipo de telas y prendas.</p>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://source.unsplash.com/random/600x400/?backlight" alt="Backlight" class="service-img">
+                <div class="service-content">
+                    <h3 class="service-title">Backlight</h3>
+                    <p class="service-desc">Impresiones retroiluminadas para máximo impacto visual.</p>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://source.unsplash.com/random/600x400/?sticker" alt="Stickers Troquelado" class="service-img">
+                <div class="service-content">
+                    <h3 class="service-title">Stickers Troquelado</h3>
+                    <p class="service-desc">Adhesivos personalizados con cortes precisos para cualquier forma.</p>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://source.unsplash.com/random/600x400/?banner" alt="Pendones" class="service-img">
+                <div class="service-content">
+                    <h3 class="service-title">Pendones</h3>
+                    <p class="service-desc">Banners de gran formato para eventos y publicidad exterior.</p>
+                </div>
+            </div>
+            <div class="service-card">
+                <img src="https://source.unsplash.com/random/600x400/?advertising" alt="Palomas Publicitarias" class="service-img">
+                <div class="service-content">
+                    <h3 class="service-title">Palomas Publicitarias</h3>
+                    <p class="service-desc">Displays promocionales para punto de venta con diseños impactantes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="calculator">
+        <i>$</i>
+    </div>
+
+    <div class="calculator-modal">
+        <div class="calculator-content">
+            <div class="close-modal">×</div>
+            <h2>Calculadora de Precios</h2>
+            <div class="calculator-tabs">
+                <div class="calculator-tab active" data-tab="design">Diseño Gráfico</div>
+                <div class="calculator-tab" data-tab="print">Impresión</div>
+                <div class="calculator-tab" data-tab="quantity">Cantidades</div>
+            </div>
+            <div class="calculator-panel active" id="design-panel">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Diseño</label>
+                    <select class="form-control">
+                        <option>Logo Básico</option>
+                        <option>Logo Premium</option>
+                        <option>Identidad Completa</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Complejidad</label>
+                    <input type="range" class="range-slider" min="1" max="10" value="5">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tiempo de Entrega</label>
+                    <select class="form-control">
+                        <option>Estándar (7 días)</option>
+                        <option>Express (3 días)</option>
+                        <option>Urgente (24 horas)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="calculator-panel" id="print-panel">
+                <div class="form-group">
+                    <label class="form-label">Material</label>
+                    <select class="form-control">
+                        <option>Vinil Adhesivo</option>
+                        <option>Lona Front</option>
+                        <option>Backlight</option>
+                        <option>Textil</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dimensiones</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" class="form-control" placeholder="Ancho (cm)">
+                        <input type="number" class="form-control" placeholder="Alto (cm)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Acabados</label>
+                    <div>
+                        <input type="checkbox" id="cut"> <label for="cut">Corte</label>
+                        <input type="checkbox" id="laminate"> <label for="laminate">Laminado</label>
+                        <input type="checkbox" id="eyelets"> <label for="eyelets">Ojales</label>
+                    </div>
+                </div>
+            </div>
+            <div class="calculator-panel" id="quantity-panel">
+                <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <input type="number" class="form-control" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descuento por Volumen</label>
+                    <div class="range-slider-container">
+                        <input type="range" class="range-slider" min="1" max="1000" value="1">
+                        <div class="range-values">
+                            <span>1</span>
+                            <span>500</span>
+                            <span>1000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Precio Unitario</label>
+                    <input type="text" class="form-control" value="$50.00" readonly>
+                </div>
+            </div>
+            <button class="btn">Generar Cotización</button>
+        </div>
+    </div>
+
+    <section id="portfolio" class="portfolio">
+        <h2 class="section-title">Portfolio Destacado</h2>
+        <div class="portfolio-grid">
+            <div class="portfolio-item">
+                <img src="https://source.unsplash.com/random/600x400/?branding" alt="Proyecto 1" class="portfolio-img">
+                <div class="portfolio-overlay">
+                    <h3 class="portfolio-title">Branding Corporativo</h3>
+                    <p class="portfolio-category">Diseño de Logo</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                
